@@ -6,6 +6,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 final _firebase = FirebaseAuth.instance;
 
@@ -27,6 +28,9 @@ class _AuthScreenState extends State<AuthScreen> {
   var _enteredUsername = '';
   File? _selectedImage;
   var _isAuthenticating = false;
+  final _googleSignIn = GoogleSignIn();
+  final _auth = FirebaseAuth.instance;
+
 
   void _submit() async {
     final isValid = _form.currentState!.validate();
@@ -76,6 +80,23 @@ class _AuthScreenState extends State<AuthScreen> {
           content: Text(error.message ?? 'Authentication failed.'),
         ),
       );
+    }
+  }
+
+  void _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
+      final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
+
+      final AuthCredential credential = GoogleAuthProvider.credential(
+        accessToken: googleSignInAuthentication.accessToken,
+        idToken: googleSignInAuthentication.idToken,
+      );
+
+      await _auth.signInWithCredential(credential);
+    } on FirebaseAuthException catch (error) {
+      // Handle Google Sign-In errors here
+      print('Error signing in with Google: $error');
     }
   }
 
@@ -187,6 +208,24 @@ class _AuthScreenState extends State<AuthScreen> {
                               child: Text(_isLogin
                                   ? 'Create an account'
                                   : 'I already have an account'),
+                            ),
+                          if (!_isAuthenticating)
+                            ElevatedButton(
+                              onPressed: _signInWithGoogle,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Theme.of(context).colorScheme.primary, // You can customize the color
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Image.asset(
+                                    'assets/images/google.png', // You need to provide your own Google logo image
+                                    height: 24,
+                                  ),
+                                  const SizedBox(width: 10),
+                                  Text('Sign in with Google',style: TextStyle(color: Colors.white),),
+                                ],
+                              ),
                             ),
                         ],
                       ),

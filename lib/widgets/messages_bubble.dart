@@ -124,7 +124,13 @@ class MessageBubble extends StatelessWidget {
                       vertical: 4,
                       horizontal: 12,
                     ),
-                    child: Text(
+                    child: message.contains('SentImageG')
+                        ? Image.network(
+                      message,
+                      height: 150.0,
+                      width: 150.0,
+                    )
+                        : Text(
                       message,
                       style: TextStyle(
                         // Add a little line spacing to make the text look nicer
