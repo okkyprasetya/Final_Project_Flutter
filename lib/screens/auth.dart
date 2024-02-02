@@ -1,6 +1,7 @@
 //auth.dart
 import 'dart:io';
 
+import 'package:project3_firebase_project/providers/isLogin.dart';
 import 'package:project3_firebase_project/widgets/user_image_picker.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
@@ -30,7 +31,6 @@ class _AuthScreenState extends State<AuthScreen> {
   var _isAuthenticating = false;
   final _googleSignIn = GoogleSignIn();
   final _auth = FirebaseAuth.instance;
-
 
   void _submit() async {
     final isValid = _form.currentState!.validate();
@@ -83,7 +83,7 @@ class _AuthScreenState extends State<AuthScreen> {
     }
   }
 
-  void _signInWithGoogle() async {
+  Future<void> _signInWithGoogle() async {
     try {
       final GoogleSignInAccount? googleSignInAccount = await _googleSignIn.signIn();
       final GoogleSignInAuthentication googleSignInAuthentication = await googleSignInAccount!.authentication;
